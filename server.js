@@ -20,6 +20,7 @@ const { DB } = process.env;
 // middlewares
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(cors());
 
 // routes
 app.use('/api/users',userRoute);
