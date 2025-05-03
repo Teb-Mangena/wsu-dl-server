@@ -43,7 +43,7 @@ export const signupUser = async (req, res) => {
     await sendEmail(
       email,
       'Congratulations on your Selection! 🎉',
-      `Hi ${lastName} ${name},\n\nCongratulations!!! We are thrilled to announce that you have been selected to take part in the WSU Digital Learning Platform as ${role === "admin" ? "an admin role" : "a student"}.\n\nTo get started, please use your email (${email}) and the following password (${password}) to log in.\n\nCheers,\nWSU Digital learning platform`
+      `Hi ${lastName} ${name},\n\nCongratulations!!! We are thrilled to announce that you have been selected to take part in the WSU Digital Learning Platform as ${role === "admin" ? "an admin role" : "a student"}.\n\nTo get started, please use your email (${email}) and the following password (${password}) to log in.\n https://wsu-digital-learn.vercel.app/ \n\nCheers,\nWSU Digital learning platform`
     );
 
     // create token
