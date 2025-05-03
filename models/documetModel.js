@@ -8,13 +8,16 @@ const documentSchema = new Schema({
     required: true
   },
   image: {
-    type: String
+    url: String,
+    publicId: String
+  },
+  pdf: {
+    url: String,
+    publicId: String,
+    fileName: String,
+    size: Number
   },
   content: {
-    type: String,
-    required:true
-  },
-  link: {
     type: String,
     required:true
   }

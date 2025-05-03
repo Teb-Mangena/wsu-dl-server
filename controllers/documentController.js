@@ -3,32 +3,63 @@ import uploadFromBuffer from '../lib/cloudinary.js'
 
 // post document
 export const postDocument = async (req, res) => {
-  const { topic, content, link } = req.body;
-  const image = req.file.buffer;
+  const { topic, content } = req.body;
+  const imageFile = req.files?.image?.[0];
+  const pdfFile = req.files?.pdf?.[0];
 
   // Validate required fields
-  if (!image) {
-    return res.status(400).json({ error: 'Image file is required.' });
-  }
-  if (!topic || !content || !link) {
-    return res.status(400).json({ error: 'Topic, Contents and link are required.' });
+  if (!topic || !content) {
+    return res.status(400).json({ error: 'Topic, Contents are required.' });
   }
 
   try {
-    // Upload image buffer from request to Cloudinary
-    const uploadResult = await uploadFromBuffer(image);
+    let imageData = null;
+    let pdfData = null;
+
+    // Process image
+    if (imageFile) {
+      const imageResult = await uploadFromBuffer(imageFile.buffer, {
+        resourceType: 'image'
+      });
+      imageData = {
+        url: imageResult.secure_url,
+        publicId: imageResult.public_id
+      };
+    }
+
+    // Process PDF with metadata
+    if (pdfFile) {
+      const pdfResult = await uploadFromBuffer(pdfFile.buffer, {
+        resourceType: 'raw',
+        format: 'pdf',
+        fileName: pdfFile.originalname.replace(/\.[^/.]+$/, "") // Remove extension
+      });
+      
+      pdfData = {
+        url: pdfResult.secure_url,
+        publicId: pdfResult.public_id,
+        fileName: pdfFile.originalname,
+        size: pdfResult.bytes
+      };
+    }
 
     const newDocument = new Document({
       topic,
       content,
-      link,
-      image: uploadResult.secure_url
+      image: imageData,
+      pdf: pdfData
     });
 
-    // Save the new book to MongoDB
     await newDocument.save();
+    
+    res.status(201).json({
+      ...newDocument.toObject(),
+      pdf: {
+        ...newDocument.pdf,
+        downloadUrl: `${pdfData.url}?dl=${encodeURIComponent(pdfData.fileName)}.pdf`
+      }
+    });
 
-    res.status(201).json(newDocument);
   } catch (error) {
     res.status(500).json({ error: error.message || 'Server Error' });
   }

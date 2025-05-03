@@ -5,7 +5,13 @@ import { upload } from '../lib/cloudinary.js';
 const router = express.Router();
 
 // post document
-router.post('/', upload.single('image'),postDocument);
+router.post('/', 
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'pdf', maxCount: 1 }
+  ]), 
+  postDocument
+);
 
 // get document
 router.get('/',getDocument);
