@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDocument, postDocument } from "../controllers/documentController.js";
+import { getDocument, postDocument,deleteOneDocument, deleteAllDocs } from "../controllers/documentController.js";
 import { upload } from '../lib/cloudinary.js';
 
 const router = express.Router();
@@ -15,6 +15,12 @@ router.post('/',
 
 // get document
 router.get('/',getDocument);
+
+// delete one document
+router.delete('/:id', deleteOneDocument);
+
+// delete all documents
+router.delete('/delete-all', deleteAllDocs);
 
 
 export default router;
