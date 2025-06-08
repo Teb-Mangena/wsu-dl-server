@@ -6,7 +6,8 @@ import cors from "cors";
 
 // import from routes
 import userRoute from "./routes/userRoutes.js";
-import documentRoute from './routes/documentRoute.js'
+import quizzRoute from './routes/quizzRoute.js';
+import documentRoute from './routes/documentRoute.js';
 
 // configure dotenv
 dotenv.config();
@@ -26,6 +27,7 @@ app.use(cors());
 // routes
 app.use('/api/users',userRoute);
 app.use('/api/documents',documentRoute);
+app.use('/api/quizz',quizzRoute);
 
 // connect to DB
 mongoose.connect(DB)
