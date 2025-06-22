@@ -1,30 +1,33 @@
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
 
-const requireAuth = async (req,res,next) => {
-  // verify authentication
-  const { authorization } = req.headers;
-
-  if(!authorization){
-    return res.status(401).json({error:'Authentication is required'});
+const requireAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  // Check for Bearer token format
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization token required in Bearer format' });
   }
 
-  // get token
-  const token = authorization.split(' ')[1];
+  const token = authHeader.split(' ')[1];
 
   try {
-    // verify token
-    const {_id} = jwt.verify(token,process.env.SECRET);
-
-    // attach user
-    req.user = await User.findById(_id).select('_id');
-
+    const decoded = jwt.verify(token, process.env.SECRET);
+    
+    // Ensure consistent user object structure
+    req.user = {
+      id: decoded.id,
+      name: decoded.name,
+      surname: decoded.surname
+    };
+    
     next();
-
   } catch (error) {
-    console.log(error);
-    res.status(401).json({error:'Request is not authorized'});
+    // Specific error handling
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(401).json({ error: 'Invalid token' });
   }
-}
+};
 
 export default requireAuth;

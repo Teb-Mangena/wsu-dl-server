@@ -1,4 +1,5 @@
-import Quizz from "../models/quizzModel.js";
+import Quizz from "../models/quizzModel.js";4
+import QuizResult from "../models/quizResult.js";
 
 // get all quizzes
 export const getQuizzes = async (req,res)=>{
@@ -104,5 +105,85 @@ export const updateQuizz = async (req, res) => {
     res.status(200).json({ message: "Quiz updated successfully", quiz: updatedQuiz });
   } catch (error) {
     res.status(500).json({ error: error.message || "Internal server error" });
+  }
+};
+
+// STARTS HERE
+
+// Submit quiz answers
+export const submitQuizAnswers = async (req, res) => {
+  try {
+    const { answers } = req.body;
+    const user = req.user;
+
+    // Validate input
+    if (!Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ error: "Answers array required" });
+    }
+
+    // Get all question IDs at once
+    const questionIds = answers.map(a => a.quizId);
+    const questions = await Quizz.find({ _id: { $in: questionIds } });
+
+    // Create question map for quick lookup
+    const questionMap = {};
+    questions.forEach(q => {
+      questionMap[q._id.toString()] = q;
+    });
+
+    // Calculate results
+    let score = 0;
+    const detailedAnswers = [];
+
+    for (const answer of answers) {
+      const quiz = questionMap[answer.quizId];
+      
+      if (!quiz) {
+        detailedAnswers.push({
+          quizId: answer.quizId,
+          error: "Question not found"
+        });
+        continue;
+      }
+
+      const isCorrect = quiz.correctAnswer === answer.answer;
+      if (isCorrect) score++;
+
+      detailedAnswers.push({
+        questionId: quiz._id,
+        userAnswer: answer.answer,
+        correctAnswer: quiz.correctAnswer,
+        isCorrect
+      });
+    }
+
+    console.log(user);
+
+    // Save results
+    const quizResult = await QuizResult.create({
+      userId: user.id,
+      name: user.name,
+      surname: user.surname,
+      score,
+      total: answers.length,
+      answers: detailedAnswers
+    });
+
+    // Send response
+    res.status(200).json({
+      userId: user.id,
+      name: user.name,
+      surname: user.surname,
+      score,
+      total: answers.length,
+      percentage: Math.round((score / answers.length) * 100),
+      timestamp: quizResult.createdAt
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error processing quiz submission',
+      error: error.message
+    });
   }
 };

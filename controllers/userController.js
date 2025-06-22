@@ -4,8 +4,12 @@ import mongoose from "mongoose";
 import sendEmail from "../utils/emailService.js";
 
 // create a resuable token
-const createToken = (id) => {
-  return jwt.sign({id},process.env.SECRET,{expiresIn:'3d'});
+const createToken = (id,name,surname) => {
+  return jwt.sign(
+    {id,name,surname},
+    process.env.SECRET,
+    {expiresIn:'3d'}
+  );
 }
 
 // login user
@@ -16,7 +20,11 @@ export const loginUser = async (req,res) => {
     const user = await User.login(email,password);
 
     // create token
-    const token = createToken(user._id);
+    const token = createToken(
+      user._id,
+      user.name,
+      user.lastName
+    );
 
     res.status(200).json({
       email,
@@ -47,7 +55,11 @@ export const signupUser = async (req, res) => {
     );
 
     // create token
-    const token = createToken(user._id);
+    const token = createToken(
+      user._id,
+      user.name,
+      user.lastName
+    );
 
     res.status(201).json({
       user: {
