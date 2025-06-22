@@ -1,8 +1,11 @@
 import express from "express";
-import { countCorrectAnswers, deleteQuizz, getQuizzes,postQuizz, submitQuizAnswers, updateQuizz } from "../controllers/quizzController.js";
+import { countCorrectAnswers, deleteQuizz, getQuizzes,getResults,postQuizz, submitQuizAnswers, updateQuizz } from "../controllers/quizzController.js";
 import requireAuth from "../middlewares/requireAuth.js";
 
 const router = express.Router();
+
+// get quiz results
+router.get('/results',getResults);
 
 // Protected
 router.use(requireAuth);

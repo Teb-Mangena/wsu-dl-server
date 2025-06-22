@@ -187,3 +187,14 @@ export const submitQuizAnswers = async (req, res) => {
     });
   }
 };
+
+// get all quizz results
+export const getResults = async (req,res) => {
+  try {
+    const results = await QuizResult.find({});
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({error:"Internal Server error"})
+  }
+}
