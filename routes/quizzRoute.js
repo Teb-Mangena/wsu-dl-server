@@ -1,5 +1,5 @@
 import express from "express";
-import { countCorrectAnswers, deleteQuizz, getQuizzes,getResults,postQuizz, submitQuizAnswers, updateQuizz } from "../controllers/quizzController.js";
+import { countCorrectAnswers, deleteQuizz, getMyResults, getQuizzes,getResults,postQuizz, submitQuizAnswers, updateQuizz } from "../controllers/quizzController.js";
 import requireAuth from "../middlewares/requireAuth.js";
 
 const router = express.Router();
@@ -15,6 +15,9 @@ router.get('/',getQuizzes);
 
 router.post('/', postQuizz);
 router.post('/submit', submitQuizAnswers);
+
+// get user results
+router.get('/user-results',getMyResults);
 
 // update quizzes
 router.patch('/',updateQuizz);
