@@ -8,6 +8,14 @@ const quizResultSchema = new Schema({
     ref: "User",
     required: true
   },
+  name: {
+    type: String,
+    required: true
+  },
+  surname: {
+    type: String,
+    required: true
+  },
   score: {
     type: Number,
     required: true
