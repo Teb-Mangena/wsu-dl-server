@@ -202,14 +202,12 @@ export const getResults = async (req,res) => {
 // get my own results
 export const getMyResults = async (req, res) => {
   try {
-    const userId  = req.user._id;
-    const results = await QuizResult
-      .find({ user: userId }) 
-      .sort({ createdAt: -1 }); 
+    const userId = req.user.id;
+
+    const results = await QuizResult.find({userId}).sort({createdAt:-1}); 
 
     return res.status(200).json(results);
   } catch (error) {
-    console.error("getMyResults error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
